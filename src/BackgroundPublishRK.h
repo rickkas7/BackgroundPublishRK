@@ -38,7 +38,7 @@ typedef std::function<void(bool succeeded,
 /**
  * @brief Background publish class. You typically instantiate one of these as a global variable.
  */
-class BackgroundPublish
+class BackgroundPublishRK
 {
 public:
     /**
@@ -49,7 +49,7 @@ public:
      * method to get the singleton instance of this class, as there can only be one per
      * application.
      */
-    static BackgroundPublish &instance();
+    static BackgroundPublishRK &instance();
 
     /**
      * @brief Start the background publish thread. Required!
@@ -57,7 +57,7 @@ public:
      * You typically call this from setup() using:
      * 
      * ```
-     * BackgroundPublish::instance().start();
+     * BackgroundPublishRK::instance().start();
      * ```
      */
     void start();
@@ -109,7 +109,7 @@ private:
     /**
      * @brief Constructor - This class is a singleton and you cannot construct one.
      */
-    BackgroundPublish();
+    BackgroundPublishRK();
 
     /**
      * @brief Destructor
@@ -117,17 +117,17 @@ private:
      * You normally instantiate this class as a global variable so it will never be deleted, but if
      * you do choose to delete one, the thread will be stopped.
      */
-    virtual ~BackgroundPublish();
+    virtual ~BackgroundPublishRK();
 
     /**
      * @brief This class is not copyable
      */
-    BackgroundPublish(const BackgroundPublish&) = delete;
+    BackgroundPublishRK(const BackgroundPublishRK&) = delete;
 
     /**
      * @brief This class is not copyable
      */
-    BackgroundPublish& operator=(const BackgroundPublish&) = delete;
+    BackgroundPublishRK& operator=(const BackgroundPublishRK&) = delete;
 
 
     Thread *thread = NULL;		//!< Thread object pointer. Allocated during start()
@@ -143,5 +143,5 @@ private:
     PublishCompletedCallback completed_cb = NULL; 	//!< Completion callback (optional)
     const void *event_context = NULL; 		//!< Context passed to completion (optional)
 
-    static BackgroundPublish *_instance; //!< Singleton instance of this class
+    static BackgroundPublishRK *_instance; //!< Singleton instance of this class
 };

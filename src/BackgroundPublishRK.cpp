@@ -7,24 +7,24 @@
 
 #include "BackgroundPublishRK.h"
 
-BackgroundPublish *BackgroundPublish::_instance;
+BackgroundPublishRK *BackgroundPublishRK::_instance;
 
-BackgroundPublish::BackgroundPublish() {
+BackgroundPublishRK::BackgroundPublishRK() {
 }
 
-BackgroundPublish::~BackgroundPublish()
+BackgroundPublishRK::~BackgroundPublishRK()
 {
     stop();
 }
 
-BackgroundPublish &BackgroundPublish::instance() {
+BackgroundPublishRK &BackgroundPublishRK::instance() {
     if (!_instance) {
-        _instance = new BackgroundPublish();
+        _instance = new BackgroundPublishRK();
     }
     return *_instance;
 }
 
-void BackgroundPublish::start()
+void BackgroundPublishRK::start()
 {
     if(!thread)
     {
@@ -33,13 +33,13 @@ void BackgroundPublish::start()
         // use OS_THREAD_PRIORITY_DEFAULT so that application, system, and
         // background publish thread will all run at the same priority and
         // be able to preempt each other
-        thread = new Thread("BackgroundPublish",
+        thread = new Thread("BackgroundPublishRK",
             [this]() { thread_f(); },
             OS_THREAD_PRIORITY_DEFAULT);
     }
 }
 
-void BackgroundPublish::stop()
+void BackgroundPublishRK::stop()
 {
     if(thread)
     {
@@ -50,7 +50,7 @@ void BackgroundPublish::stop()
     }
 }
 
-void BackgroundPublish::thread_f()
+void BackgroundPublishRK::thread_f()
 {
     while(true)
     {
@@ -110,7 +110,7 @@ void BackgroundPublish::thread_f()
     }
 }
 
-bool BackgroundPublish::publish(const char *name, const char *data, PublishFlags flags, PublishCompletedCallback cb, const void *context)
+bool BackgroundPublishRK::publish(const char *name, const char *data, PublishFlags flags, PublishCompletedCallback cb, const void *context)
 {
     // protect against separate threads trying to publish at the same time
     WITH_LOCK(*this)
