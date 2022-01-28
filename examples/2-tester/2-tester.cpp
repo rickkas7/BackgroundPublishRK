@@ -65,7 +65,7 @@ void publish_disconnected()
     // in a race condition where the retry could be canceled.
     disconnect_publish_requested = false;
 
-    success = BackgroundPublish::instance().publish("disconnect",
+    success = BackgroundPublishRK::instance().publish("disconnect",
         String::format("disconnect_duration_sec=%lu", disconnect_duration_sec),
         PRIVATE | WITH_ACK,
         publish_disconnected_cb);
@@ -97,7 +97,7 @@ void cloud_status_handler(system_event_t event, int data)
 // setup() runs once, when the device is first turned on.
 void setup()
 {
-    BackgroundPublish::instance().start();
+    BackgroundPublishRK::instance().start();
 
     System.on(cloud_status, cloud_status_handler);
 
@@ -141,7 +141,7 @@ void loop()
         // try to publish a connected event every 30 seconds no matter what
         last_connected_publish_sec = uptime_sec;
         Log.info("trying to publish \"connect\"");
-        BackgroundPublish::instance().publish("connect",
+        BackgroundPublishRK::instance().publish("connect",
             String::format("connect_duration_sec=%lu", connect_duration_sec),
             PRIVATE | WITH_ACK);
     }

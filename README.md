@@ -13,7 +13,7 @@ Here's a simple example:
 ```
 #include "Particle.h"
 
-#include "BackgroundPublish.h"
+#include "BackgroundPublishRK.h"
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 SYSTEM_THREAD(ENABLED);
@@ -29,7 +29,7 @@ void publishCallback(publish_status_t status, const char *eventName, const char 
 
 void setup() {
 	// This must be called from setup() to start the background publishing thread
-	BackgroundPublish::instance().start();
+	BackgroundPublishRK::instance().start();
 	Particle.connect();
 }
 
@@ -42,8 +42,8 @@ void loop() {
 		char data[64];
 		snprintf(data, sizeof(data), "test %d", ++counter);
 
-		// Use BackgroundPublish::instance().publish instead of Particle.publish
-	    bool bResult = BackgroundPublish::instance().publish(eventName, data, PRIVATE | WITH_ACK, publishCallback);
+		// Use BackgroundPublishRK::instance().publish instead of Particle.publish
+	    bool bResult = BackgroundPublishRK::instance().publish(eventName, data, PRIVATE | WITH_ACK, publishCallback);
 	    Log.info("publish returned %d", bResult);
 	}
 }
@@ -90,7 +90,7 @@ Background publish class. You typically instantiate one of these as a global var
 
 ---
 
-### void BackgroundPublish::start() 
+### void BackgroundPublishRK::start() 
 
 Start the background publish thread. Required!
 
@@ -101,12 +101,12 @@ void start()
 You typically call this from setup() using:
 
 ```cpp
-BackgroundPublish::instance().start();
+BackgroundPublishRK::instance().start();
 ```
 
 ---
 
-### void BackgroundPublish::stop() 
+### void BackgroundPublishRK::stop() 
 
 Stop the background publish thread.
 
@@ -118,7 +118,7 @@ Normally you start it and never stop it, but this method is provided for special
 
 ---
 
-### bool BackgroundPublish::publish(const char * name, const char * data, PublishFlags flags, PublishCompletedCallback cb, const void * context) 
+### bool BackgroundPublishRK::publish(const char * name, const char * data, PublishFlags flags, PublishCompletedCallback cb, const void * context) 
 
 Publish method. Use this instead of Particle.publish().
 
@@ -139,7 +139,7 @@ bool publish(const char * name, const char * data, PublishFlags flags, PublishCo
 
 ---
 
-### void BackgroundPublish::lock() 
+### void BackgroundPublishRK::lock() 
 
 Used internally to mutex lock to safely access data structures from multiple threads.
 
@@ -151,7 +151,7 @@ You do not need to use this under normal circumstances as publish() handles this
 
 ---
 
-### void BackgroundPublish::unlock() 
+### void BackgroundPublishRK::unlock() 
 
 Used internally to mutex lock to safely access data structures from multiple threads.
 
@@ -162,6 +162,9 @@ void unlock()
 
 ## Revision History
 
+### 0.0.2 (2022-01-28)
+
+- Rename BackgroundPublishRK class to BackgroundPublishRK to avoid conflict with a class of the same name in Tracker Edge.
 
 ### 0.0.1 (2021-04-16)
 

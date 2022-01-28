@@ -16,7 +16,7 @@ void publishCallback(bool succeeded, const char *eventName, const char *eventDat
 
 void setup() {
 	// This must be called from setup() to start the background publishing thread
-	BackgroundPublish::instance().start();
+	BackgroundPublishRK::instance().start();
 
 	Particle.connect();
 }
@@ -30,8 +30,8 @@ void loop() {
 		char data[64];
 		snprintf(data, sizeof(data), "test %d", ++counter);
 
-		// Use BackgroundPublish::instance().publish instead of Particle.publish
-	    bool bResult = BackgroundPublish::instance().publish(eventName, data, PRIVATE | WITH_ACK, publishCallback);
+		// Use BackgroundPublishRK::instance().publish instead of Particle.publish
+	    bool bResult = BackgroundPublishRK::instance().publish(eventName, data, PRIVATE | WITH_ACK, publishCallback);
 	    Log.info("publish returned %d", bResult);
 	}
 }
