@@ -24,6 +24,12 @@ BackgroundPublishRK &BackgroundPublishRK::instance() {
     return *_instance;
 }
 
+void BackgroundPublishRK::setup(TimedLock *ParticlePublishLock)
+{
+    Log.info("Background setup");
+    this->ParticlePublishLock = ParticlePublishLock;
+}
+
 void BackgroundPublishRK::start()
 {
     if(!thread)
@@ -80,10 +86,12 @@ void BackgroundPublishRK::thread_f()
         // use the Future<bool> object directly as its default wait
         // (used by WITH_ACK) short-circuits when not called from the
         // main application thread
-        auto ok = Particle.publish(event_name, event_data, event_flags);
-
-        // then wait for publish to complete
-        while(!ok.isDone() && state != BACKGROUND_PUBLISH_STOP)
+        particle::Future<bool> request;
+        WITH_LOCK(*ParticlePublishLock) {
+            request = Particle.publish(event_name, event_data, event_flags);
+            // then wait for publish to complete
+        }
+        while(!request.isDone() && state != BACKGROUND_PUBLISH_STOP)
         {
             // yield to rest of system while we wait
             delay(1);
@@ -91,7 +99,7 @@ void BackgroundPublishRK::thread_f()
 
         if(completed_cb)
         {
-            completed_cb(ok.isSucceeded(),
+            completed_cb(request.isSucceeded(),
                 event_name,
                 event_data,
                 event_context);
@@ -112,6 +120,7 @@ void BackgroundPublishRK::thread_f()
 
 bool BackgroundPublishRK::publish(const char *name, const char *data, PublishFlags flags, PublishCompletedCallback cb, const void *context)
 {
+    
     // protect against separate threads trying to publish at the same time
     WITH_LOCK(*this)
 

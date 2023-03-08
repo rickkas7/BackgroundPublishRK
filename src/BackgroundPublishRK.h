@@ -4,6 +4,7 @@
 // License: MIT
 
 #include "Particle.h"
+#include "Lockable.h"
 
 #include <protocol_defs.h>
 
@@ -50,6 +51,11 @@ public:
      * application.
      */
     static BackgroundPublishRK &instance();
+
+    /**
+     * @brief Passes in the Particle publish lock 
+     */
+    void setup(TimedLock *ParticlePublishLock);
 
     /**
      * @brief Start the background publish thread. Required!
@@ -131,6 +137,7 @@ private:
 
 
     Thread *thread = NULL;		//!< Thread object pointer. Allocated during start()
+    TimedLock *ParticlePublishLock;
     void thread_f();			//!< Thread function, passed to the Thread object
     os_mutex_t mutex;	//!< Mutex to protect access to class members from multiple threads
     volatile publish_thread_state_t state = BACKGROUND_PUBLISH_IDLE; //!< Current state
