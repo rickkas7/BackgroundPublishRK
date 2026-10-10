@@ -113,40 +113,43 @@ void BackgroundPublishRK::thread_f()
 bool BackgroundPublishRK::publish(const char *name, const char *data, PublishFlags flags, PublishCompletedCallback cb, const void *context)
 {
     // protect against separate threads trying to publish at the same time
+    // (WITH_LOCK only guards the statement that follows it, so the whole
+    // request is in a block)
     WITH_LOCK(*this)
-
-    // check currently in idle state and ready to accept publish request
-    if(!thread || state != BACKGROUND_PUBLISH_IDLE)
     {
-        return false;
-    }
+        // check currently in idle state and ready to accept publish request
+        if(!thread || state != BACKGROUND_PUBLISH_IDLE)
+        {
+            return false;
+        }
 
-    // event name is required to publish
-    // all other arguments may be be left out or defaulted
-    if(!name)
-    {
-        return false;
-    }
+        // event name is required to publish
+        // all other arguments may be be left out or defaulted
+        if(!name)
+        {
+            return false;
+        }
 
-    // have the lock and thread is currently idle
-    // safe to prepare publish request
-    strncpy(event_name, name, sizeof(event_name));
-    event_name[sizeof(event_name)-1] = '\0'; // ensure null termination
+        // have the lock and thread is currently idle
+        // safe to prepare publish request
+        strncpy(event_name, name, sizeof(event_name));
+        event_name[sizeof(event_name)-1] = '\0'; // ensure null termination
 
-    if(data)
-    {
-        strncpy(event_data, data, sizeof(event_data));
-        event_data[sizeof(event_data)-1] = '\0'; // ensure null termination
-    }
-    else
-    {
-        event_data[0] = '\0'; // null terminate at start for no event data
-    }
+        if(data)
+        {
+            strncpy(event_data, data, sizeof(event_data));
+            event_data[sizeof(event_data)-1] = '\0'; // ensure null termination
+        }
+        else
+        {
+            event_data[0] = '\0'; // null terminate at start for no event data
+        }
 
-    completed_cb = cb;
-    event_context = context;
-    event_flags = flags;
-    state = BACKGROUND_PUBLISH_REQUESTED;
+        completed_cb = cb;
+        event_context = context;
+        event_flags = flags;
+        state = BACKGROUND_PUBLISH_REQUESTED;
+    }
 
     return true;
 }
